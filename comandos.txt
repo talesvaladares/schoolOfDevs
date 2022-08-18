@@ -1,2 +1,4 @@
 add-migration InitialMigration
 update-database
+add-migration ValueConvertion
+dotnet new gitignore
