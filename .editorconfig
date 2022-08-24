@@ -5,3 +5,6 @@ dotnet_diagnostic.CS8618.severity = none
 
 # CS8600: Conversão de literal nula ou possível valor nulo em tipo não anulável.
 dotnet_diagnostic.CS8600.severity = none
+
+# CS0162: Código inacessível detectado
+dotnet_diagnostic.CS0162.severity = none

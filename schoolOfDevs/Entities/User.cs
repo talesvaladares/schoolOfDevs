@@ -1,4 +1,5 @@
-﻿using schoolOfDevs.Enuns;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using schoolOfDevs.Enuns;
 
 namespace schoolOfDevs.Entities
 {
@@ -11,5 +12,12 @@ namespace schoolOfDevs.Entities
         public string  UserName { get; set; }
         public string Password { get; set; }
 
+        //não vira uma coluna na tabela
+        //não é mapeada nas migrations
+        [NotMapped]
+        public string ConfirmPassword { get; set; }
+
+        [NotMapped]
+        public string CurrentPassword { get; set; }
     }
 }

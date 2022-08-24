@@ -1,14 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using schoolOfDevs.Entities;
 using schoolOfDevs.Helpers;
+using BC = BCrypt.Net.BCrypt;
 
 namespace schoolOfDevs.Services { 
 
     public interface IUserService {
         public Task<List<User>> GetAll();
-        public Task<User> Create(User user);
+        public Task<User> Create(User User);
         public Task<User> GetById(int id);
-        public Task Update(User userIn, int id);
+        public Task Update(User User);
         public Task Delete(int id);
 
     }
@@ -26,15 +27,23 @@ namespace schoolOfDevs.Services {
 
         public async Task<User> Create(User user)
         {
+
             User userDb = await _context.Users
-               .AsNoTracking()
-               .SingleOrDefaultAsync(u => u.UserName == user.UserName);
+                .AsNoTracking()
+                .SingleOrDefaultAsync(u => u.UserName == user.UserName);
 
             if (userDb is not null)
             {
-                throw new Exception($"UserName {user.UserName} already exist.");
+                throw new Exception($"Username {user.UserName} already exist.");
             }
 
+            if (!user.Password.Equals(user.ConfirmPassword))
+            {
+                throw new Exception("Password does not match confirmPassword");
+            }
+
+            user.Password = BC.HashPassword(user.Password);
+           
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
@@ -43,14 +52,14 @@ namespace schoolOfDevs.Services {
 
         public async Task Delete(int id)
         {
-            User userDb = await _context.Users.SingleOrDefaultAsync(u => u.Id == id);
+            User UserDb = await _context.Users.SingleOrDefaultAsync(u => u.Id == id);
 
-            if (userDb is null)
+            if (UserDb is null)
             {
                 throw new Exception($"User {id} not found");
             }
 
-            _context.Users.Remove(userDb);
+            _context.Users.Remove(UserDb);
             await _context.SaveChangesAsync();
         }
 
@@ -58,33 +67,45 @@ namespace schoolOfDevs.Services {
      
         public async Task<User> GetById(int id)
         {
-            User userDb = await _context.Users
+            User UserDb = await _context.Users
                 .SingleOrDefaultAsync(u => u.Id == id);
 
-            if (userDb is null)
+            if (UserDb is null)
             {
                 throw new Exception($"User {id} not found");
             }
 
-            return userDb;
+            return UserDb;
         }
 
-        public async Task Update(User userIn, int id)
+        public async Task Update(User user)
         {
-            if (userIn.Id != id)
+
+            if (!user.Password.Equals(user.ConfirmPassword))
             {
-                throw new Exception($"Route id differs user id");
+                throw new Exception("Password does not match confirmPassword");
             }
 
-            User userDb = await _context.Users
-                .SingleOrDefaultAsync(u => u.Id == id);
+            User UserDb = await _context.Users
+                .AsNoTracking()
+                .SingleOrDefaultAsync(u => u.Id == user.Id);
 
-            if (userDb is null)
+            if (UserDb is null)
             {
-                throw new Exception($"User {id} not found");
+                throw new Exception($"User { user.Id} not found");
             }
 
-            _context.Entry(userIn).State = EntityState.Modified;
+            if (!BC.Verify(user.CurrentPassword, UserDb.Password))
+            {
+                throw new Exception("Incorret Password");
+            }
+
+           
+            //para nao perder a data de criação
+            user.CreatedAt = UserDb.CreatedAt;
+            user.Password = BC.HashPassword(user.Password);
+
+            _context.Entry(user).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
     }

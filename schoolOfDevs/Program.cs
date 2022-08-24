@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using schoolOfDevs.Helpers;
+using schoolOfDevs.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DataContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
  );
+
+// injeção de dependencias
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<INoteService, NoteService>();
 
 var app = builder.Build();
 

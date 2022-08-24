@@ -13,10 +13,6 @@ namespace schoolOfDevs.Helpers
             
         }
 
-        public DbSet<User> Users { get; set; }
-        public DbSet<Note> Notes { get; set; }
-        public DbSet<Course> Courses { get; set; }
-
         // este metodo serve para converter um enum para um string
         // por exemplo para cada tipo do enum student ou teachar no banco ficaria salvo 0 para student ou 1 para teacher
         // com esta conversão o banco ficara salvo o proprio texto do enum teachar ou student
@@ -30,6 +26,33 @@ namespace schoolOfDevs.Helpers
                     v => (TypeUser)Enum.Parse(typeof(TypeUser), v)
                 );
         }
+
+        //metodo que sobrescreve o saveChangesAsync
+        //para que de forma automatica ele passe o creted_at e o updated_at para o objeto
+        //primeiro ele verifica se o objeto herda do baseEntity que criamos com o id e update e create_at
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToke = default)
+        {
+            var entries = ChangeTracker
+                .Entries()
+                .Where(e => e.Entity is BaseEntity && (
+                e.State == EntityState.Added
+                || e.State == EntityState.Modified));
+
+            foreach (var entityEntry in entries)
+            {
+                DateTime datetime = DateTime.Now;
+                ((BaseEntity)entityEntry.Entity).UpdatedAt = datetime;
+
+                if (entityEntry.State == EntityState.Added)
+                    ((BaseEntity)entityEntry.Entity).CreatedAt = datetime;
+
+            }
+             return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToke);
+        }
+
+        public DbSet<User> Users { get; set; }
+        public DbSet<Note> Notes { get; set; }
+        public DbSet<Course> Courses { get; set; }
 
 
     }
