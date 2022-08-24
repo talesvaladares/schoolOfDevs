@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using schoolOfDevs.Entities;
+using schoolOfDevs.Exceptions;
 using schoolOfDevs.Helpers;
 
 namespace schoolOfDevs.Services { 
@@ -31,7 +32,7 @@ namespace schoolOfDevs.Services {
 
             if (courseDb is not null )
             {
-                throw new Exception($"Course {course.Name} already exist.");
+                throw new BadRequestException($"Course {course.Name} already exist.");
             }
 
             _context.Courses.Add(course);
@@ -46,7 +47,7 @@ namespace schoolOfDevs.Services {
 
             if (courseDb is null)
             {
-                throw new Exception($"Course {id} not found");
+                throw new KeyNotFoundException($"Course {id} not found");
             }
 
             _context.Courses.Remove(courseDb);
@@ -62,7 +63,7 @@ namespace schoolOfDevs.Services {
 
             if (courseDb is null)
             {
-                throw new Exception($"Course {id} not found");
+                throw new KeyNotFoundException($"Course {id} not found");
             }
 
             return courseDb;
@@ -77,7 +78,7 @@ namespace schoolOfDevs.Services {
 
             if (courseDb is null)
             {
-                throw new Exception($"Course {course.Id} not found");
+                throw new KeyNotFoundException($"Course {course.Id} not found");
             }
 
             course.CreatedAt = courseDb.CreatedAt;

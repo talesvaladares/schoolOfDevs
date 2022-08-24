@@ -38,7 +38,7 @@ namespace schoolOfDevs.Services {
 
             if (NoteDb is null)
             {
-                throw new Exception($"Note {id} not found");
+                throw new KeyNotFoundException($"Note {id} not found");
             }
 
             _context.Notes.Remove(NoteDb);
@@ -54,7 +54,7 @@ namespace schoolOfDevs.Services {
 
             if (NoteDb is null)
             {
-                throw new Exception($"Note {id} not found");
+                throw new KeyNotFoundException($"Note {id} not found");
             }
 
             return NoteDb;
@@ -69,7 +69,7 @@ namespace schoolOfDevs.Services {
 
             if (NoteDb is null)
             {
-                throw new Exception($"Note {Note.Id} not found");
+                throw new KeyNotFoundException($"Note {Note.Id} not found");
             }
 
             Note.CreatedAt = NoteDb.CreatedAt;

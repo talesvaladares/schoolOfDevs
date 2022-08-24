@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using schoolOfDevs.Entities;
+using schoolOfDevs.Exceptions;
 using schoolOfDevs.Helpers;
 using BC = BCrypt.Net.BCrypt;
 
@@ -34,12 +35,12 @@ namespace schoolOfDevs.Services {
 
             if (userDb is not null)
             {
-                throw new Exception($"Username {user.UserName} already exist.");
+                throw new BadRequestException($"Username {user.UserName} already exist.");
             }
 
             if (!user.Password.Equals(user.ConfirmPassword))
             {
-                throw new Exception("Password does not match confirmPassword");
+                throw new BadRequestException("Password does not match confirmPassword");
             }
 
             user.Password = BC.HashPassword(user.Password);
@@ -56,7 +57,7 @@ namespace schoolOfDevs.Services {
 
             if (UserDb is null)
             {
-                throw new Exception($"User {id} not found");
+                throw new KeyNotFoundException($"User {id} not found");
             }
 
             _context.Users.Remove(UserDb);
@@ -72,7 +73,7 @@ namespace schoolOfDevs.Services {
 
             if (UserDb is null)
             {
-                throw new Exception($"User {id} not found");
+                throw new KeyNotFoundException($"User {id} not found");
             }
 
             return UserDb;
@@ -83,7 +84,7 @@ namespace schoolOfDevs.Services {
 
             if (!user.Password.Equals(user.ConfirmPassword))
             {
-                throw new Exception("Password does not match confirmPassword");
+                throw new BadRequestException("Password does not match confirmPassword");
             }
 
             User UserDb = await _context.Users
@@ -92,12 +93,12 @@ namespace schoolOfDevs.Services {
 
             if (UserDb is null)
             {
-                throw new Exception($"User { user.Id} not found");
+                throw new KeyNotFoundException($"User { user.Id} not found");
             }
 
             if (!BC.Verify(user.CurrentPassword, UserDb.Password))
             {
-                throw new Exception("Incorret Password");
+                throw new BadRequestException("Incorret Password");
             }
 
            
